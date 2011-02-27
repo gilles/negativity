@@ -1,0 +1,27 @@
+{
+  "name": "Negativity",
+  "version": "0.1",
+  "description": "Negativity - Simple feedback on Yelp reviews!",
+  "icons": { 
+      "128": "icon-128.png",
+      "48": "icon-48.png"
+  },
+  "permissions": [
+    "tabs",
+    "http://yui.yahooapis.com/",
+    "http://negativity.heroku.com/*",
+    "http://www.yelp.com/*"
+  ],
+  "background_page" : "background.html",
+  "content_scripts": [
+    {
+      "matches": ["http://www.yelp.com/*"],
+      "js" : ["yui.js", "negativity.js"]
+    }
+  ],
+  "browser_action": {
+    "default_title": "Negativity",
+    "default_icon": "icon.png",
+    "popup": "popup.html"
+  }
+}
