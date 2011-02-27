@@ -5,3 +5,7 @@
 #
 #   cities = City.create([{ :name => 'Chicago' }, { :name => 'Copenhagen' }])
 #   Mayor.create(:name => 'Daley', :city => cities.first)
+
+Mongoid.master.collections.reject { |c| c.name =~ /^system/}.each(&:drop)
+Vote.create!(:url => 'http://www.google.com', :review_id => 1, :reviewer_id => 1, :vote => Vote::VoteType::BULLSHIT)
+Vote.create!(:url => 'http://www.google.com', :review_id => 1, :reviewer_id => 2, :vote => Vote::VoteType::IDIOT)
