@@ -1,7 +1,10 @@
 class Vote
   include Mongoid::Document
 
-  Rails.logger.debug("ete")
+  module VoteType
+    BULLSHIT = 0
+    IDIOT = 1
+  end
 
   #user who made the vote, can be nil
   #no user a/c for now, is nil
@@ -15,7 +18,7 @@ class Vote
   #target of the vote (a yelp user ID)
   field :reviewer_id, :type => String
 
+  #vote type
   field :vote, :type => Integer
-
 
 end
