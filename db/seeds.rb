@@ -7,4 +7,4 @@
 #   Mayor.create(:name => 'Daley', :city => cities.first)
 
 Mongoid.master.collections.reject { |c| c.name =~ /^system/}.each(&:drop)
-User.create!(:_id => 'anonymous')
+User.create!(:name => 'anonymous')
