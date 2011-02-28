@@ -13,7 +13,8 @@ class VotesController < ApplicationController
   end
 
   def create
-    @vote = Vote.new(params[:vote])
+    p = params[:vote]
+    @vote = Vote.vote(p[:user_id], p[:url], p[:item_id], p[:reviewer_id], p[:vote_type])
     flash['notice'] = "Vote created" if @vote.save
     respond_with @vote, :location => votes_url
   end
