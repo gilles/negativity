@@ -1,7 +1,7 @@
 Negativity::Application.routes.draw do
   
   resources :votes, :except => [:update, :destroy, :edit]
-  get "session" => 'session#create'
+  get "session" => 'session#new'
 
   # The priority is based upon order of creation:
   # first created -> highest priority.
