@@ -7,10 +7,8 @@
       "48": "icon-48.png"
   },
   "permissions": [
-    "tabs",
-    "http://yui.yahooapis.com/",
-    "http://negativity.heroku.com/*",
-    "http://www.yelp.com/*"
+    "http://vivid-snow-285.heroku.com/*",
+    "http://localhost/*"
   ],
   "background_page" : "background.html",
   "content_scripts": [

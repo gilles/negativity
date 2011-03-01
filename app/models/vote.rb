@@ -17,6 +17,7 @@ class Vote
     def self.get(value)
       value
     end
+
     #for mongoid
     def self.set(value)
       value
@@ -42,17 +43,16 @@ class Vote
   field :votes, :type => Integer
 
   #our key is user_id / item_id / reviewer_id / vote_type
-  #:vote is there so we don't have to sort
   index([
                 [:user_id, Mongo::ASCENDING],
                 [:item_id, Mongo::ASCENDING],
                 [:reviewer_id, Mongo::ASCENDING],
-                [:vote_type, Mongo::ASCENDING],
-                [:vote, Mongo::ASCENDING]
+                [:vote_type, Mongo::ASCENDING]
         ],
         :unique => true)
 
   #TODO more indexes depending on the requests we want to make
+  #TODO create the item/reviewer leaderboard via mapreduce or port my world famous counter model
 
   attr_protected :count
   validates_presence_of :user_id, :url, :item_id, :reviewer_id, :vote_type, :count

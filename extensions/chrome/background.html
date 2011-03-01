@@ -1,40 +1,96 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-	<head>
-		<title>Negativity<title>
-		<meta charset="utf-8" />
-		<meta name="keywords" content="Negativity, Yelp, Reviews, Feedback" />
-		<meta name="description" content="Negativity - Simple Negative Yelp Reviews" />
-		<meta name="language" content="en" />
-		<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/combo?3.3.0/build/cssreset/reset-min.css&amp;3.3.0/build/cssfonts/fonts-min.css&amp;3.3.0/build/cssgrids/grids-min.css&amp;3.3.0/build/cssbase/base-min.css" charset="utf-8" />
-	</head>
-	<body id="ng" class="yui3-skin-sam">
+<head>
+  <title>Negativity</title>
+  <meta charset="utf-8"/>
+  <meta name="keywords" content="Negativity, Yelp, Reviews, Feedback"/>
+  <meta name="description" content="Negativity - Simple Negative Yelp Reviews"/>
+  <meta name="language" content="en"/>
+  <link rel="stylesheet" type="text/css"
+        href="http://yui.yahooapis.com/combo?3.3.0/build/cssreset/reset-min.css&amp;3.3.0/build/cssfonts/fonts-min.css&amp;3.3.0/build/cssgrids/grids-min.css&amp;3.3.0/build/cssbase/base-min.css"
+        charset="utf-8"/>
+</head>
+<body id="ng" class="yui3-skin-sam">
 
-		<div id="ng-content">
-      
-		</div>
-		<script type="text/javascript" src="http://yui.yahooapis.com/combo?3.3.0/build/yui/yui-min.js&amp;3.3.0/build/oop/oop-min.js&amp;3.3.0/build/jsonp/jsonp-min.js&amp;3.3.0/build/jsonp/jsonp-url-min.js&amp;3.3.0/build/yql/yql-min.js&amp;3.3.0/build/dom/dom-min.js&amp;3.3.0/build/dom/dom-style-ie-min.js&amp;3.3.0/build/event-custom/event-custom-min.js&amp;3.3.0/build/event/event-min.js&amp;3.3.0/build/pluginhost/pluginhost-min.js&amp;3.3.0/build/node/node-min.js&amp;3.3.0/build/event/event-base-ie-min.js&amp;3.3.0/build/attribute/attribute-min.js&amp;3.3.0/build/base/base-base-min.js&amp;3.3.0/build/plugin/plugin-min.js&amp;3.3.0/build/event-simulate/event-simulate-min.js&amp;3.3.0/build/node/node-event-simulate-min.js&amp;3.3.0/build/node-focusmanager/node-focusmanager-min.js&amp;3.3.0/build/querystring/querystring-stringify-simple-min.js&amp;3.3.0/build/queue-promote/queue-promote-min.js&amp;3.3.0/build/datatype/datatype-xml-min.js&amp;3.3.0/build/io/io-min.js&amp;3.3.0/build/collection/array-extras-min.js&amp;3.3.0/build/querystring/querystring-min.js&amp;3.3.0/build/querystring/querystring-parse-simple-min.js&amp;3.3.0/build/dom/selector-css3-min.js&amp;3.3.0/build/json/json-min.js" charset="utf-8"></script>
-    <script>
-    
-     function fetchReviews(callback)
-     {
-       alert('finding reviews'); 
-     };
+<div id="ng-content">
 
-      /**
-       * Handles data sent via chrome.extension.sendRequest().
-       * @param request Object Data sent in the request.
-       * @param sender Object Origin of the request.
-       * @param callback Function The method to call when the request completes.
-       */
-      function onRequest(request, sender, callback) {
-        if (request.action == 'fetchReviews') {
-          fetchRevews(callback);
-        }
+</div>
+<!--<script type="text/javascript"-->
+<!--src="http://yui.yahooapis.com/combo?3.3.0/build/yui/yui-min.js&amp;3.3.0/build/oop/oop-min.js&amp;3.3.0/build/jsonp/jsonp-min.js&amp;3.3.0/build/jsonp/jsonp-url-min.js&amp;3.3.0/build/yql/yql-min.js&amp;3.3.0/build/dom/dom-min.js&amp;3.3.0/build/dom/dom-style-ie-min.js&amp;3.3.0/build/event-custom/event-custom-min.js&amp;3.3.0/build/event/event-min.js&amp;3.3.0/build/pluginhost/pluginhost-min.js&amp;3.3.0/build/node/node-min.js&amp;3.3.0/build/event/event-base-ie-min.js&amp;3.3.0/build/attribute/attribute-min.js&amp;3.3.0/build/base/base-base-min.js&amp;3.3.0/build/plugin/plugin-min.js&amp;3.3.0/build/event-simulate/event-simulate-min.js&amp;3.3.0/build/node/node-event-simulate-min.js&amp;3.3.0/build/node-focusmanager/node-focusmanager-min.js&amp;3.3.0/build/querystring/querystring-stringify-simple-min.js&amp;3.3.0/build/queue-promote/queue-promote-min.js&amp;3.3.0/build/datatype/datatype-xml-min.js&amp;3.3.0/build/io/io-min.js&amp;3.3.0/build/collection/array-extras-min.js&amp;3.3.0/build/querystring/querystring-min.js&amp;3.3.0/build/querystring/querystring-parse-simple-min.js&amp;3.3.0/build/dom/selector-css3-min.js&amp;3.3.0/build/json/json-min.js"-->
+<!--charset="utf-8"></script>-->
+<script>
+
+  Negativity = {
+
+    neg : function(hostname) {
+
+      var _hostname = hostname;
+      var session = '';
+
+      var makeCall = function(method, path, params, callback) {
+        var xhr = new XMLHttpRequest();
+          xhr.onreadystatechange = function(data) {
+            if (xhr.readyState == 4) {
+              if (xhr.status == 200) {
+                var response = JSON.parse(xhr.responseText);
+                callback(response)
+              } else {
+                callback(null)
+              }
+            }
+          };
+          // Note that any URL fetched here must be matched by a permission in
+          // the manifest.json file!
+          var url = 'http://' + _hostname + path;
+          xhr.open(method, url, true);
+          xhr.setRequestHeader('Content-Type', 'application/json');
+          xhr.send(JSON.stringify(params));
       };
 
-      // Wire up the listener.
-      chrome.extension.onRequest.addListener(onRequest);
-    </script>
-	</body>
+      return {
+
+        getSession : function() {
+          makeCall('GET', '/session', null, function(response) {
+            session = response['X-CSRF-Token']
+          })
+        },
+
+        postReview : function(params, callback) {
+          alert('post', params);
+          makeCall('POST', '/votes', params, callback)
+        },
+
+        fetchReviews : function(params, callback) {
+          makeCall('GET', '/votes', params, callback)
+        }
+      }
+    }
+  };
+
+
+//  var instance = Negativity.neg('vivid-snow-285.heroku.com');
+  var instance = Negativity.neg('localhost');
+
+  /**
+   * Handles data sent via chrome.extension.sendRequest().
+   * @param request Object Data sent in the request.
+   * @param sender Object Origin of the request.
+   * @param callback Function The method to call when the request completes.
+   */
+  function onRequest(request, sender, callback) {
+    if (request.action == 'getSession') {
+      instance.getSession();
+    }
+    if (request.action == 'postReview') {
+      instance.postReview(request.params, callback);
+    }
+    if (request.action == 'fetchReviews') {
+      instance.fetchReviews(request.params, callback);
+    }
+  }
+
+  // Wire up the listener.
+  chrome.extension.onRequest.addListener(onRequest);
+</script>
+</body>
 </html>
