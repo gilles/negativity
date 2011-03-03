@@ -1,5 +1,5 @@
 Negativity::Application.routes.draw do
-  
+
   #votes
   post 'votes' => 'votes#create'
   get 'votes/item/:id' => 'votes#item'
@@ -8,6 +8,11 @@ Negativity::Application.routes.draw do
   #really a get but you don't control the size of the batch => use post
   post 'votes/batch' => 'votes#batch'
 
+  #totals
+  get "total/item/:id" => 'total#item'
+  get "total/reviewer/:id" => 'total#reviewer'
+
+  #session / csrf token
   get "session" => 'session#new'
 
   # The priority is based upon order of creation:

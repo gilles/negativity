@@ -77,8 +77,8 @@ class Vote
                 :reviewer_id => vote[:reviewer_id],
                 :url => vote[:url]}
     update = {'$inc' => {"votes.#{vote[:vote_type]}" => 1}}
-    self.collection.update(selector, update, {:upsert => true})
 
+    self.collection.update(selector, update, {:upsert => true, :safe => true})
     #per item trend
     counter_name = 'item:'+vote[:item_id]+':'+vote[:vote_type]
     Counter.increment(counter_name)

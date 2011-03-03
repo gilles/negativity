@@ -1,5 +1,7 @@
 class VotesController < ApplicationController
 
+  before_filter :page
+
   respond_to :html, :json
 
   def review
@@ -8,25 +10,13 @@ class VotesController < ApplicationController
   end
 
   def item
-    #I have the total available, create a compatible output
-    item_id = params[:id]
-    vote    = Vote.where(:item_id => item_id).first
-    votes   = Counter.global(/item:#{item_id}:.*/, nil).inject({}) do |memo, record|
-      memo[record.name.split(':')[2]] = record.count; memo
-    end
-    @vote   = {:item_id => item_id, :url => vote.url, :votes => votes}
-    respond_with @vote
+    @votes    = Vote.where(:item_id => params[:id]).skip(@skip).limit(@limit)
+    respond_with @votes
   end
 
   def reviewer
-    #I have the total available, create a compatible output
-    reviewer_id = params[:id]
-    vote        = Vote.where(:reviewer_id => reviewer_id).first
-    votes       = Counter.global(/reviewer:#{reviewer_id}:.*/, nil).inject({}) do |memo, record|
-      memo[record.name.split(':')[2]] = record.count; memo
-    end
-    @vote       = {:reviewer_id => reviewer_id, :url => vote.url, :votes => votes}
-    respond_with @vote
+    @votes    = Vote.where(:reviewer_id => params[:id]).skip(@skip).limit(@limit)
+    respond_with @votes
   end
 
   def batch
@@ -36,6 +26,12 @@ class VotesController < ApplicationController
   def create
     Vote.vote(params[:vote])
     render :nothing => true, :status => :created
+  end
+
+  private
+  def page
+    @start = params[:start] || 0
+    @limit = params[:limit] || 10
   end
 
 end

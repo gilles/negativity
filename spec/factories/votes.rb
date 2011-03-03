@@ -7,6 +7,6 @@ def factory_vote(options={})
              :reviewer_id => '1',
              :vote_type => Vote::VoteType::INSANE}
 
-  opts = options.merge(defaults)
+  opts = defaults.merge(options)
   Vote.vote(opts)
 end
