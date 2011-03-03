@@ -1,5 +1,5 @@
 class WelcomeController < ApplicationController
   def index
-    redirect_to votes_path
+    @votes = Vote.limit(30)
   end
 end

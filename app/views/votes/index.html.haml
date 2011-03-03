@@ -1,5 +1,0 @@
-%h1 All votes
-%ul
-  - @votes.each do |vote|
-    %li
-      =render :partial => 'vote', :object => vote, :locals => {:linked => true}

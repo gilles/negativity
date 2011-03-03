@@ -2,8 +2,8 @@ require 'spec_helper'
 
 describe WelcomeController do
 
-  it "should do some stuff" do
-    pending "whatever this should do"
+  it "should do something" do
+    pending "do it"
   end
 
 end

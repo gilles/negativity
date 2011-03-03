@@ -1,18 +1,25 @@
 # a vote, we are not storing by row but using mongodb
 # atomic modifiers ($inc)
+# This model contains a per item / per review vote object
+#
 # @attr [BSON::ObjectID] user_id The user making the vote, can be anonymous
-# @attr [String] url The original url
 # @attr [String] item_id The main item being reviewed
+# @attr [String] url The original url of the item
+# @attr [String] review The review
 # @attr [String] reviewer_id The person making the review
-# @attr [Integer] vote_type The vote type,
+# @attr [Hash] votes The votes per {Vote::VoteType}
 # @attr [Integer] count The counter
 class Vote
   include Mongoid::Document
 
   module VoteType
-    INSANE = 0
-    FOS    = 1 #Full of shit
-    TMI    = 2 #Too much info
+    #insane
+    INSANE = 'ins'
+    #Full of shit
+    FOS = 'fos'
+    #Full of shit
+    TMI = 'tmi'
+
     #for mongoid
     def self.get(value)
       value
@@ -24,64 +31,85 @@ class Vote
     end
   end
 
-  #user who made the vote, can be nil
-  #no user a/c for now, is nil
-  field :user_id
-
-  #the original URL
-  field :url, :type => String
+  #item_id and review_id should be unique
+  #TODO check
 
   #what's being reviewed
   field :item_id, :type => String
-  #the reviewer ID (a yelp user ID)
+  #the review ID (a yelp review id)
+  field :review_id, :type => String
+  #the reviewer ID (a yelp reviewer id)
   field :reviewer_id, :type => String
 
-  #vote type
-  field :vote_type, :type => VoteType
+  #the original URL of the item
+  field :url, :type => String
 
-  #number of votes
-  field :votes, :type => Integer
+  # { vote_type : type, count : count } hash
+  field :votes, :type => Object, :default => {VoteType::INSANE => 0,
+                                              VoteType::FOS => 0,
+                                              VoteType::TMI => 0}
 
-  #our key is user_id / item_id / reviewer_id / vote_type
-  index([
-                [:user_id, Mongo::ASCENDING],
-                [:item_id, Mongo::ASCENDING],
-                [:reviewer_id, Mongo::ASCENDING],
-                [:vote_type, Mongo::ASCENDING]
-        ],
-        :unique => true)
-
-  #TODO more indexes depending on the requests we want to make
-  #TODO create the item/reviewer leaderboard via mapreduce or port my world famous counter model
-
-  attr_protected :count
-  validates_presence_of :user_id, :url, :item_id, :reviewer_id, :vote_type, :count
+  #group by item to get page leader-board
+  index :item_id, :unique => true
+  #group by review to get review leader-board
+  index :review_id, :unique => true
+  #group by reviewer to get people leader-board
+  index :reviewer_id
 
   #Make a vote
-  #@param [String] user_id (see #Vote)
-  #@param [String] url (see #Vote)
-  #@param [String] item_id (see #Vote)
-  #@param [String] reviewer_id (see #Vote)
-  #@param [String] vote_type (see #Vote)
+  #
+  #@param [Hash] vote
+  #@option vote [String] user_id
+  #@option vote [String] url
+  #@option vote [String] item_id
+  #@option vote [String] review_id
+  #@option vote [String] reviewer_id
+  #@option vote [String] vote_type
+  #
+  #@see {Vote} for a description of the parameters
   #@note This is the only method you should use to create a vote
-  def self.vote(user_id, url, item_id, reviewer_id, vote_type)
-    if authorized?(user_id, item_id, reviewer_id, vote_type)
-      user_id  ||= User.anonymous.id
-      selector = {:user_id => user_id, :item_id => item_id.to_s, :reviewer_id => reviewer_id.to_s, :vote_type => vote_type}
-      update   = {'$set' => {:url => url}, '$inc' => {:votes => 1}}
-      self.collection.update(selector, update, {:upsert => true})
-    end
+  def self.vote(vote = {})
+    vote = vote.symbolize_keys
+    validate!(vote)
+
+    selector = {:item_id => vote[:item_id],
+                :review_id => vote[:review_id],
+                :reviewer_id => vote[:reviewer_id],
+                :url => vote[:url]}
+    update = {'$inc' => {"votes.#{vote[:vote_type]}" => 1}}
+    self.collection.update(selector, update, {:upsert => true})
+
+    #per item trend
+    counter_name = 'item:'+vote[:item_id]+':'+vote[:vote_type]
+    Counter.increment(counter_name)
+
+    #per reviewer trend
+    counter_name = 'reviewer:'+vote[:reviewer_id]+':'+vote[:vote_type]
+    Counter.increment(counter_name)
   end
 
   private
 
   # Check the combination is authorized to vote
-  #@param [String] user_id (see #Vote)
-  #@param [String] item_id (see #Vote)
-  #@param [String] reviewer_id (see #Vote)
-  #@param [String] vote_type (see #Vote)
-  def self.authorized?(user_id, item_id, reviewer_id, vote_type)
+  # Example of rule: every hour per item_id/reviewer_id/vote_type for anonymous, only once for logged in
+  #
+  #@param [Hash] vote
+  #@option vote [String] user_id
+  #@option vote [String] item_id
+  #@option vote [String] reviewer_id
+  #@option vote [String] vote_type
+  #
+  #@see {Vote} for a description of the parameters
+  def self.authorized?(vote)
     true
+  end
+
+  def self.validate!(vote)
+    [:item_id, :reviewer_id, :review_id, :url, :vote_type].each do |field|
+      raise ArgumentError, "#{field} can't be empty" if vote[field].blank?
+    end
+
+    raise Exception, 'not authorized' if !authorized?(vote)
   end
 
 end

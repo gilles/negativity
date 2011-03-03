@@ -1,10 +1,12 @@
-# Read about factories at http://github.com/thoughtbot/factory_girl
+def factory_vote(options={})
 
-Factory.define :vote do |v|
-  v.user_id { User.anonymous.id }
-  v.url "http://url"
-  v.item_id 1
-  v.reviewer_id 1
-  v.vote_type Vote::VoteType::INSANE
-  v.votes 1
+  defaults = {:user_id => User.anonymous.id,
+             :item_id => '1',
+             :url => 'http://url',
+             :review_id => '1',
+             :reviewer_id => '1',
+             :vote_type => Vote::VoteType::INSANE}
+
+  opts = options.merge(defaults)
+  Vote.vote(opts)
 end

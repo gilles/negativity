@@ -28,15 +28,15 @@ YUI().use("node",
     Y.all('div.rateReview ul').each(function(node) {
 
       var insane = Y.Node.create('<li class="insane smaller"><a href="#" rel="insane"><span><strong>Insane!</strong></span></a></li>');
-      Y.on("click", postReview, insane, { 'item_id': '123', 'reviewer_id': '321', 'vote': '0' });
+      Y.on("click", postReview, insane, { 'vote' : {'url': 'http://url', 'item_id': '123', 'review_id': '321', 'reviewer_id': '231', 'vote_type': '0' }});
       node.append(insane);
 
       var bs = Y.Node.create('<li class="bs smaller"> <a href="#" rel="bs"><span><strong>Full of Shit!</strong></span></a></li>');
-      Y.on("click", postReview, bs, { 'item_id': '123', 'reviewer_id': '321', 'vote': '1' });
+      Y.on("click", postReview, bs, { 'vote' : {'url': 'http://url', 'item_id': '123', 'review_id': '321', 'reviewer_id': '231', 'vote_type': '1' }});
       node.append(bs);
 
       var tmi = Y.Node.create('<li class="tmi smaller"> <a href="#" rel="tmi"><span><strong>Nobody Cares!</strong></span></a></li>');
-      Y.on("click", postReview, bs, { 'item_id': '123', 'reviewer_id': '321', 'vote': '2' });
+      Y.on("click", postReview, bs, {'vote' : {'url': 'http://url', 'item_id': '123', 'review_id': '321', 'reviewer_id': '231', 'vote_type': '2' }});
       node.append(tmi);
 
     });

@@ -1,6 +1,13 @@
 Negativity::Application.routes.draw do
   
-  resources :votes, :except => [:update, :destroy, :edit]
+  #votes
+  post 'votes' => 'votes#create'
+  get 'votes/item/:id' => 'votes#item'
+  get 'votes/review/:id' => 'votes#review'
+  get 'votes/reviewer/:id' => 'votes#reviewer'
+  #really a get but you don't control the size of the batch => use post
+  post 'votes/batch' => 'votes#batch'
+
   get "session" => 'session#new'
 
   # The priority is based upon order of creation:

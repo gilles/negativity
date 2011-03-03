@@ -1,4 +1,6 @@
 .bundle
+.yardoc
 db/*.sqlite3
 log/*.log
 tmp/
+doc/
