@@ -14,6 +14,15 @@ YUI().use("node",
 
   function(Y) {
 
+    /**
+     * Get the session
+     * @param session
+     */
+    function setSession(session) {
+      console.log(session);
+    }
+    chrome.extension.sendRequest({'action' : 'getSession'}, setSession);
+
     function reviewPosted(response) {
       console.log(response);
     }
@@ -59,12 +68,12 @@ YUI().use("node",
 
         //TODO make a function out of this, including getting all info
 
-        var insane = Y.Node.create('<li class="insane smaller"><a href="#" rel="insane"><span><strong>Insane!</strong></span></a></li>');
+        var insane = Y.Node.create('<li class="ins smaller"><a href="#" rel="ins"><span><strong>Insane!</strong></span></a></li>');
         Y.on("click", postReview, insane, { 'vote' : {'url': 'http://url',
                                                       'item_id': itemId,
                                                       'review_id': reviewId,
                                                       'reviewer_id': reviewerId,
-                                                      'vote_type': '0' }}
+                                                      'vote_type': 'ins' }}
             );
         node.append(insane);
 
@@ -73,7 +82,7 @@ YUI().use("node",
                                                   'item_id': itemId,
                                                   'review_id': reviewId,
                                                   'reviewer_id': reviewerId,
-                                                  'vote_type': '1' }}
+                                                  'vote_type': 'fos' }}
             );
         node.append(bs);
 
@@ -82,7 +91,7 @@ YUI().use("node",
                                                  'item_id': itemId,
                                                  'review_id': reviewId,
                                                  'reviewer_id': reviewerId,
-                                                 'vote_type': '2' }}
+                                                 'vote_type': 'tmi' }}
             );
         node.append(tmi);
       }
@@ -90,19 +99,25 @@ YUI().use("node",
     });
 
     /**
-     * Get the session
-     * @param session
-     */
-    function setSession(session) {
-      console.log(session);
-    }
-    chrome.extension.sendRequest({'action' : 'getSession'}, setSession);
-
-    /**
      * Get the counters
      */
     function showReviews(response) {
-      console.log(response);
+      response.forEach(function(element) {
+
+        var reviewNode = Y.one('li[id=review_'+element['review_id']+']');
+
+        ['ins', 'tmi', 'bs'].forEach(function(type){
+          var value = element['votes'][type];
+          if (value !== undefined) {
+            console.log('a[rel='+type+']');
+            var childNode = reviewNode.one('a[rel='+type+']');
+            console.log(childNode);
+            var span = Y.Node.create('<span>('+value+')</span>');
+            childNode.get('parentNode').append(span);
+          }
+        });
+
+      });
     }
     chrome.extension.sendRequest({'action' : 'fetchReviews', 'params' : {'reviewIds':allIds}}, showReviews);
 

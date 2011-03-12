@@ -21,7 +21,7 @@ class VotesController < ApplicationController
   end
 
   def batch
-    @votes = Vote.where({:review_id.in => params[:reviewIds]}).to_a
+    @votes = Vote.where({:review_id.in => params[:reviewIds]}).only(:review_id, :votes).to_a
     #don't use respond_with, this is a post that is not a create thing, the default responder does not like this
     render :json => @votes.to_json
   end
@@ -30,7 +30,7 @@ class VotesController < ApplicationController
     status = :created
     message = {}
     begin
-      Vote.vote(params[:vote])
+      Vote.vote(params[:vote], form_authenticity_token)
     rescue StandardError => e
       #not really but it's an error code...
       status = :bad_request

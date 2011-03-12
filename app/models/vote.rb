@@ -73,7 +73,7 @@ class Vote
   #
   #@see {Vote} for a description of the parameters
   #@note This is the only method you should use to create a vote
-  def self.vote(vote = {}, session_id=nil)
+  def self.vote(vote, session_id)
     vote = vote.symbolize_keys
     validate!(vote, session_id)
 
@@ -115,10 +115,6 @@ class Vote
   #@see {Vote} for a description of the parameters
   def self.authorized?(vote, session_id)
 
-    #this means I can't test this methods properly
-    #TODO find a way
-    return true unless Rails.env == 'production'
-
     #you can revote if you renew the session...
     key = vote[:user_id].to_s
     if key.blank?
@@ -131,7 +127,7 @@ class Vote
       return false
     end
 
-    Rails.cache.write(key)
+    Rails.cache.write(key, "1")
 
   end
 
