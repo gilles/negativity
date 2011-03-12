@@ -44,6 +44,9 @@ class Vote
   #the original URL of the item
   field :url, :type => String
 
+  #the text of the review
+  field :text, :type => String
+
   # { vote_type : type, count : count } hash
   field :votes, :type => Object, :default => {VoteType::INSANE => 0,
                                               VoteType::FOS => 0,
@@ -66,11 +69,13 @@ class Vote
   #@option vote [String] reviewer_id
   #@option vote [String] vote_type
   #
+  #@param [String] session_id The current session
+  #
   #@see {Vote} for a description of the parameters
   #@note This is the only method you should use to create a vote
-  def self.vote(vote = {})
+  def self.vote(vote = {}, session_id=nil)
     vote = vote.symbolize_keys
-    validate!(vote)
+    validate!(vote, session_id)
 
     selector = {:item_id => vote[:item_id],
                 :review_id => vote[:review_id],
@@ -79,6 +84,7 @@ class Vote
     update = {'$inc' => {"votes.#{vote[:vote_type]}" => 1}}
 
     self.collection.update(selector, update, {:upsert => true, :safe => true})
+
     #per item trend
     counter_name = 'item:'+vote[:item_id]+':'+vote[:vote_type]
     Counter.increment(counter_name)
@@ -86,6 +92,10 @@ class Vote
     #per reviewer trend
     counter_name = 'reviewer:'+vote[:reviewer_id]+':'+vote[:vote_type]
     Counter.increment(counter_name)
+  end
+
+  def to_json
+    {:review => review_id, :votes => votes}
   end
 
   private
@@ -96,20 +106,41 @@ class Vote
   #@param [Hash] vote
   #@option vote [String] user_id
   #@option vote [String] item_id
+  #@option vote [String] review_id
   #@option vote [String] reviewer_id
   #@option vote [String] vote_type
   #
+  #@param [String] session_id The current session
+  #
   #@see {Vote} for a description of the parameters
-  def self.authorized?(vote)
-    true
+  def self.authorized?(vote, session_id)
+
+    #this means I can't test this methods properly
+    #TODO find a way
+    return true unless Rails.env == 'production'
+
+    #you can revote if you renew the session...
+    key = vote[:user_id].to_s
+    if key.blank?
+      key = session_id
+    end
+
+    key += ":#{vote[:review_id]}"
+
+    if Rails.cache.exist?(key)
+      return false
+    end
+
+    Rails.cache.write(key)
+
   end
 
-  def self.validate!(vote)
+  def self.validate!(vote, session_id)
     [:item_id, :reviewer_id, :review_id, :url, :vote_type].each do |field|
       raise ArgumentError, "#{field} can't be empty" if vote[field].blank?
     end
 
-    raise Exception, 'not authorized' if !authorized?(vote)
+    raise Exception, 'not authorized' if !authorized?(vote, session_id)
   end
 
 end

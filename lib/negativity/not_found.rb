@@ -1,3 +1,3 @@
 module Negativity
-  class NotFound < Exception; end
+  class NotFound < StandardError; end
 end

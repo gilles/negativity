@@ -60,7 +60,7 @@
         },
 
         fetchReviews : function(params, callback) {
-          makeCall('GET', '/votes', params, callback)
+          makeCall('POST', '/votes/batch', params, callback)
         }
       }
     }

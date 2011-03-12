@@ -14,14 +14,8 @@ gem 'bson_ext'
 gem 'haml-rails'
 gem 'jquery-rails'
 
-# gem 'bj'
-# gem 'nokogiri'
-# gem 'sqlite3-ruby', :require => 'sqlite3'
-# gem 'aws-s3', :require => 'aws/s3'
+gem 'dalli'
 
-# Bundle gems for the local environment. Make sure to
-# put test-only gems in this group so their generators
-# and rake tasks are available in development mode:
 group :development, :test do
   gem 'cucumber-rails'
   gem 'capybara'
@@ -41,5 +35,6 @@ group :development, :test do
   gem 'autotest-growl'
 
   gem 'heroku'
+  gem 'yard'
   
 end

@@ -3,8 +3,13 @@ require 'spork'
 
 Spork.prefork do
 
-  # This file is copied to spec/ when you run 'rails generate rspec:install'
+#  https://github.com/timcharper/spork/wiki/Spork.trap_method-Jujutsu
   ENV["RAILS_ENV"] ||= 'test'
+
+  #trick for mongoid
+  require "rails/mongoid"
+  Spork.trap_class_method(Rails::Mongoid, :load_models)
+
   require File.expand_path("../../config/environment", __FILE__)
   require 'rspec/rails'
   require 'factory_girl'
