@@ -1,5 +1,36 @@
-%h1 All votes
-%ul
-  - @votes.each do |vote|
-    %li
-      =render :partial => 'vote', :object => vote
+%h1 Leaderboards
+%a= link_to "Places", :controller => :leaderboard, :action => :places
+%a= link_to "Reviews", :controller => :leaderboard, :action => :reviews
+-#%h1 All votes
+-#%h2 Top 10 Items
+-#%h3 Insane!
+-#%ul
+-#- @top_item_ins.each do |vote|
+-#  %li
+-#    =render :partial => 'vote', :object => vote
+-#%h3 Full Of Shit!
+-#%ul
+-#- @top_item_fos.each do |vote|
+-#  %li
+-#    =render :partial => 'vote', :object => vote
+-#%h3 Nobody Cares!
+-#%ul
+-#- @top_item_tmi.each do |vote|
+-#  %li
+-#    =render :partial => 'vote', :object => vote
+-#%h2 Top 10 Reviews
+-#%h3 Insane!
+-#%ul
+-#- @top_review_ins.each do |vote|
+-#  %li
+-#    =render :partial => 'vote', :object => vote
+-#%h3 Full Of Shit!
+-#%ul
+-#- @top_review_fos.each do |vote|
+-#  %li
+-#    =render :partial => 'vote', :object => vote
+-#%h3 Nobody Cares!
+-#%ul
+-#- @top_review_tmi.each do |vote|
+-#  %li
+-#    =render :partial => 'vote', :object => vote

@@ -5,8 +5,8 @@ def factory_vote(options={})
              :url => 'http://url',
              :review_id => '1',
              :reviewer_id => '1',
-             :vote_type => Vote::VoteType::INSANE}
+             :vote_type => Negativity::VoteType::INSANE}
 
   opts = defaults.merge(options)
-  Vote.vote(opts)
+  Review.vote(opts)
 end

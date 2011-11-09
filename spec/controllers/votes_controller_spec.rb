@@ -8,8 +8,8 @@ describe VotesController do
   end
 
   it "should be able to vote" do
-    vote = {:vote => {'item_id'=> '1', 'review_id' => '1', 'reviewer_id' => '1', 'url' => 'http://www', 'vote_type' => Vote::VoteType::INSANE}}
-    Vote.should_receive(:vote).with(vote[:vote])
+    vote = {:vote => {'item_id'=> '1', 'review_id' => '1', 'reviewer_id' => '1', 'url' => 'http://www', 'vote_type' => Negativity::VoteType::INSANE}}
+    Review.should_receive(:vote).with(vote[:vote])
     xhr :post, :create, vote
     response.status.should eq 201
   end
@@ -18,7 +18,7 @@ describe VotesController do
     xhr(:get, :review, {:id => '1'})
     assigns[:vote].should_not be_nil
     assigns[:vote][:review_id].should_not be_nil
-    assigns[:vote][:votes][Vote::VoteType::INSANE].should be 1
+    assigns[:vote][:votes][Negativity::VoteType::INSANE].should be 1
   end
 
   it "should be able to show votes for an item" do

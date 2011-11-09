@@ -14,6 +14,9 @@ YUI().use("node",
 
   function(Y) {
 
+    var itemUrl;
+    var itemId;
+
     /**
      * Get the session
      * @param session
@@ -24,16 +27,43 @@ YUI().use("node",
     chrome.extension.sendRequest({'action' : 'getSession'}, setSession);
 
     function reviewPosted(response) {
-      console.log(response);
+
+      if (response === null) {
+        return
+      }
+
+      var review = Y.one('li#review_'+response['review_id']);
+      var span = review.one('a[rel='+response['vote_type']+']+span');
+      if (span === null) {
+        var li = review.one('li.'+response['vote_type']);
+        span = Y.Node.create('<span>(0)</span>');
+        li.append(span);
+      }
+      var value = parseInt(span.getContent().replace('(', ''));
+      value+=1;
+      span.setContent('('+value+')')
     }
 
     function postReview() {
 
-      //TODO get the text of the review
-      //Actually getting the review_id / reviewer_id etc can get here
-      //It will be more efficient
+      review = Y.one('li#review_'+this['vote']['review_id']);
+      counts = review.all('a[rel=tmi]+span, a[rel=fos]+span, a[rel=ins]+span');
+      if (counts.isEmpty()) {
+        this['vote']['text'] = review.one('p.review_comment').getContent();
+        this['reviewer'] = {
+          reviewer_id: this['vote']['reviewer_id'],
+          name: review.one('a.reviewer_name').getContent(),
+          location: review.one('div.reviewer-details p.reviewer_info:last-child').getContent()
+        }
+      }
 
       chrome.extension.sendRequest({'action' : 'postReview', 'params' : this}, reviewPosted);
+    }
+
+    var itemIdNode = Y.one('meta[property="og:url"]');
+    itemUrl = itemIdNode.getAttribute('content');
+    if (itemUrl.match(/\/([^\/]+)$/)) {
+      itemId = RegExp.$1
     }
 
     var allIds = [];
@@ -57,19 +87,13 @@ YUI().use("node",
         reviewerId = RegExp.$1
       }
 
-      var itemIdNode = Y.one('meta[property="og:url"]');
-      var itemId = undefined
-      if (itemIdNode.getAttribute('content').match(/\/(.+)$/)) {
-        itemId = RegExp.$1
-      }
-
       //create our nodes
       if (reviewId !== undefined && reviewerId !== undefined) {
 
-        //TODO make a function out of this, including getting all info
+        //TODO DRY this
 
         var insane = Y.Node.create('<li class="ins smaller"><a href="#" rel="ins"><span><strong>Insane!</strong></span></a></li>');
-        Y.on("click", postReview, insane, { 'vote' : {'url': 'http://url',
+        Y.on("click", postReview, insane, { 'vote' : {'url': itemUrl,
                                                       'item_id': itemId,
                                                       'review_id': reviewId,
                                                       'reviewer_id': reviewerId,
@@ -77,17 +101,17 @@ YUI().use("node",
             );
         node.append(insane);
 
-        var bs = Y.Node.create('<li class="bs smaller"> <a href="#" rel="bs"><span><strong>Full of Shit!</strong></span></a></li>');
-        Y.on("click", postReview, bs, { 'vote' : {'url': 'http://url',
+        var fos = Y.Node.create('<li class="fos smaller"> <a href="#" rel="fos"><span><strong>Full of Shit!</strong></span></a></li>');
+        Y.on("click", postReview, fos, { 'vote' : {'url': itemUrl,
                                                   'item_id': itemId,
                                                   'review_id': reviewId,
                                                   'reviewer_id': reviewerId,
                                                   'vote_type': 'fos' }}
             );
-        node.append(bs);
+        node.append(fos);
 
         var tmi = Y.Node.create('<li class="tmi smaller"> <a href="#" rel="tmi"><span><strong>Nobody Cares!</strong></span></a></li>');
-        Y.on("click", postReview, tmi, {'vote' : {'url': 'http://url',
+        Y.on("click", postReview, tmi, {'vote' : {'url': itemUrl,
                                                  'item_id': itemId,
                                                  'review_id': reviewId,
                                                  'reviewer_id': reviewerId,
@@ -104,14 +128,12 @@ YUI().use("node",
     function showReviews(response) {
       response.forEach(function(element) {
 
-        var reviewNode = Y.one('li[id=review_'+element['review_id']+']');
+        var reviewNode = Y.one('li#review_'+element['review_id']);
 
-        ['ins', 'tmi', 'bs'].forEach(function(type){
+        ['ins', 'tmi', 'fos'].forEach(function(type){
           var value = element['votes'][type];
           if (value !== undefined) {
-            console.log('a[rel='+type+']');
             var childNode = reviewNode.one('a[rel='+type+']');
-            console.log(childNode);
             var span = Y.Node.create('<span>('+value+')</span>');
             childNode.get('parentNode').append(span);
           }

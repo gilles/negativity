@@ -1,0 +1,16 @@
+%h1 Reviews leaderboard
+.tmis
+  %h2 Too much information
+  %lu
+    -@tmis.each do |tmi|
+      %li= tmi.inspect
+.foss
+  %h2 Full of shit
+  %lu
+    -@foss.each do |tmi|
+      %li= tmi.inspect
+.inss
+  %h2 Insane
+  %lu
+    -@inss.each do |tmi|
+      %li= tmi.inspect
